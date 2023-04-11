@@ -1,3 +1,21 @@
+/**
+* @file main.cpp
+* @author Sandoval, Raña
+* @date 30/03/2023
+* @section TP 3
+* @brief 
+* @details Hay dos carpetas 
+* En Build, está el archivo mbed_config.h donde están definidas las constantes que usa mbed. 
+* En mbed-os, están las librerías de mbed
+* Luego, hay 6 archivos:
+*       .gitignore es un archivo que indica a Git que archivos o carpetas ignorar
+*       .mbed indica el modelo del dispositivo a trabajar
+*       arm_book_lib.h Es una librería armada por el libro para trabajar con los ejemplos
+*       compile_commands.json es un archivo json con los comandos para compilar
+*       main.cpp archivo principal del proyecto en c++ 
+*       mbed-os.lib link a mbed OS
+*/
+
 //=====[Libraries]=============================================================
 
 #include "mbed.h"
@@ -24,10 +42,10 @@ DigitalIn dButton(D7);
 DigitalIn mq2(PE_12);
 
 DigitalOut alarmLed(LED1);
-DigitalOut incorrectCodeLed(LED3);
+DigitalOut incorrectCodeLed(PE_10);
 DigitalOut systemBlockedLed(LED2);
 
-DigitalInOut sirenPin(PE_10);
+DigitalInOut sirenPin(LED3);
 
 UnbufferedSerial uartUsb(USBTX, USBRX, 115200);
 
@@ -119,9 +137,10 @@ void alarmActivationUpdate()
         lm35ReadingsSum = lm35ReadingsSum + lm35ReadingsArray[i];
     }
     lm35ReadingsAverage = lm35ReadingsSum / NUMBER_OF_AVG_SAMPLES;
-       lm35TempC = analogReadingScaledWithTheLM35Formula ( lm35ReadingsAverage );    
+       lm35TempC = analogReadingScaledWithTheLM35Formula ( lm35ReadingsAverage );
+       //printf("%f\n", lm35TempC);
     
-    if ( lm35TempC > OVER_TEMP_LEVEL ) {
+    if ( lm35TempC > 28 ) {
         overTempDetector = ON;
     } else {
         overTempDetector = OFF;
