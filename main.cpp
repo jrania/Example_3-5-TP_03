@@ -6,18 +6,24 @@
 * @brief 
 * @details Hay dos carpetas 
 * En Build, está el archivo mbed_config.h donde están definidas las constantes que usa mbed. 
-* En mbed-os, están las librerías de mbed
+* En mbed-os, están las librerías provistas por mbed con las funciones necesarias para
+* desarrollar los programas. Por ejemplo, se encuentra el archivo mbed.h y los correspondientes
+* a Doxygen.
 * Luego, hay 6 archivos:
 *       .gitignore es un archivo que indica a Git que archivos o carpetas ignorar
 *       .mbed indica el modelo del dispositivo a trabajar
-*       arm_book_lib.h Es una librería armada por el libro para trabajar con los ejemplos
+*       arm_book_lib.h Es una librería armada por los autores del libro para trabajar con los ejemplos
 *       compile_commands.json es un archivo json con los comandos para compilar
-*       main.cpp archivo principal del proyecto en c++ 
-*       mbed-os.lib link a mbed OS
+*       main.cpp es el archivo principal del proyecto en C++ 
+*       mbed-os.lib es la dirección al repositorio donde se encuentra la carpeta mbed-os
 */
 
 //=====[Libraries]=============================================================
 
+/** /mbed-os/.mbed
+* mbed.h incluye las librerias correspondientes a los objetos
+* que desarrolló mbed para trabajar con la plafa NUCLEO F429ZI
+* Por ejemplo, incluye el archivo DigitalIn.h */
 #include "mbed.h"
 #include "arm_book_lib.h"
 
@@ -33,6 +39,22 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
+/**
+* @brief La clase se encuentra en /drivers/include/drivers/DigitalIn.h
+* @details
+* Parra iniciar las entradas digitales se utiliza
+* el constructor de la clase DigitalIn que recibe
+* como argumento el pin físico al que estará asociado.
+*
+* El constructor espera una variable de tipo PinName. PinName es una enumeración de
+* enteros que indican el Puerto y el Pin de la placa y se encuentran en
+* mbed-os/targets/TARGET_STM/TARGET_STM32F4/TARGET_STM32F429xI/TARGET_NUCLEO_F429ZI/PinNames.h
+* Luego declara una estructura gpio_t definida en
+* mbed-os/targets/TARGET_STM/TARGET_STM32F4/TARGET_STM32F429xI/TARGET_NUCLEO_F429ZI/PinNames.h
+* y llama a la función gpio_init_in. Esta función, ubicada en mbed-os/hal/source/mbed_gpio.c
+* llama a la función gpio_init ubicada en /mbed-os/targets/TARGET_STM/gpio_api.c modifica
+* los valores de la estructura gpio_t y inicializa el clock del pin indicado en PinName
+*/
 DigitalIn enterButton(BUTTON1);
 DigitalIn alarmTestButton(D2);
 DigitalIn aButton(D4);
@@ -41,14 +63,28 @@ DigitalIn cButton(D6);
 DigitalIn dButton(D7);
 DigitalIn mq2(PE_12);
 
+/**
+* @brief La clase DigitalOut se encuentra en /drivers/include/drivers/DigitalOut.h
+*/
 DigitalOut alarmLed(LED1);
 DigitalOut incorrectCodeLed(PE_10);
 DigitalOut systemBlockedLed(LED2);
 
+/**
+* @brief la clase DigitanInOut se encuentra en /drivers/include/drivers/DigitalInOut.h
+*/
 DigitalInOut sirenPin(LED3);
 
 UnbufferedSerial uartUsb(USBTX, USBRX, 115200);
-
+/**
+* @brief La clase AnalogIn se encuentra en /drivers/include/drivers/DigitalOut.h 
+* @details Para declarar el objeto potentiometer o lm35 se llama al constructor de
+* la clase AnalogIn que inicializa el pin del puerto indiciados en el argumento.
+* Este constructor se encuentran en /mbed-os/drivers/source/AnalogIn.cpp
+* Para eso, la función utiliza un lock(), lo que bloquea el funcionamiento de la placa
+* hasta que la inicialización esté completa. Luego lo desbloquea con la función unlock().
+* En el medio, se llama a la funcion analogin_init() definida en mbed-os/targets/TARGET_STM/TARGET_STM32F4/analogin_device.c
+*/
 AnalogIn potentiometer(A0);
 AnalogIn lm35(A1);
 
@@ -105,6 +141,9 @@ int main()
 
 void inputsInit()
 {
+    /**
+    * Se llama a los métodos mode() de las clases DigitanIn y DigitanInOut
+    */
     alarmTestButton.mode(PullDown);
     aButton.mode(PullDown);
     bButton.mode(PullDown);
@@ -116,6 +155,10 @@ void inputsInit()
 
 void outputsInit()
 {
+    /**
+    * Se inicializan los pines de salida utilizando una sobrecarga en los objetos
+    * asociados a dichos pines.
+    */
     alarmLed = OFF;
     incorrectCodeLed = OFF;
     systemBlockedLed = OFF;
